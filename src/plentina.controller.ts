@@ -6,7 +6,7 @@ export class PlentinaController {
     constructor (public appService: PlentinaService) {}
     
     @Get() 
-    healthCheck(): string {
-        return this.appService.healthCheck();
+    async healthCheck(){
+        return await this.appService.healthCheck();
     }
 }
