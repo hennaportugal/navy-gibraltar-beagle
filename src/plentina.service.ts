@@ -24,12 +24,17 @@ export class PlentinaService {
    * @returns an array of Money objects
    */
   allocate(money: Money, allocationOptions: AllocationOptions): Array<Money> {
+    // It is good practice to choose to make your naming conventions consistent!
+    // const moneyVal
     const money_val = this.getValue(money.amount, money.scale)
 
     let retArray: Money[] = []
 
     if (allocationOptions.parts) {
 
+      // You can create an arbitrary array in TypeScript using this:
+      // Array.from({length: allocationOptions.parts}, element => 1)
+      // and then treating it as a "ratio" allocation option ;)
       for (var i = 0; i<allocationOptions.parts; i++) {
         const amount = (money_val / allocationOptions.parts) * (10**money.scale)
 
@@ -38,19 +43,32 @@ export class PlentinaService {
     } 
     else if (allocationOptions.ratio) {
 
+      // never use the var keyword. always let or const
       var total = allocationOptions.ratio.reduce(function(x,y) {
         return x + y
       })
 
+      // an alternative would have been to use a functional
+      // programming approach:
+      // allocation.ratio.map(ratio => {
+      //   const amount = ((allocationOptions.ratio[i] / total) * (money_val)) * (10**money.scale)
+      //   return { amount: amount, scale: money.scale }
+      // })
       for (var i = 0; i<allocationOptions.ratio.length; i++) {
         const amount = ((allocationOptions.ratio[i] / total) * (money_val)) * (10**money.scale)
 
         retArray.push({ amount: amount, scale: money.scale })
       }     
     }
+    // What if there neither ratio or parts are present?
+
     return retArray 
   }
 
+  // This is not wrong but
+  // why not encapsulate this in the Money class?
+  // The answer really depends on who you ask but
+  // it's one thing to keep in mind
   /**
    * Function to get actual value of the amount per scale
    * @param amount money value
@@ -68,9 +86,16 @@ export class PlentinaService {
    * @returns the sum
    */
   add(left: Money, right: Money): Money {
+    // naming consistency
     const left_val = this.getValue(left.amount, left.scale)
     const right_val = this.getValue(right.amount, right.scale)
 
+
+    // floating point operations can be tricky, most especially
+    // mult. Better make sure and cut out the decimal places after this.
+    // Don't worry about runtime. it's better to preserve accuracy of data 
+    // rather than runtime in this case.
+    // besides, that's a case of preoptimization that does not really matter
     const amount = (left_val + right_val) * (10**left.scale)
     
     return { amount: amount, scale: left.scale }
@@ -91,6 +116,7 @@ export class PlentinaService {
     return { amount: amount, scale: minuend.scale }
   }
 
+  // This method lacks a lot of input cleansing
   /**
    * Function to perform multiplication on 2 money objects
    * @param money amount to multiply

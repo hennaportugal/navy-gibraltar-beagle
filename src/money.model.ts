@@ -1,3 +1,12 @@
+// A corner case -
+// It is still possible to create a money object with
+// any given scale but with decimals on the amount
+// example:
+// const sampleJPY = <Money> {
+//   scale: 0,
+//   amount: 100.1
+// }
+
 export interface Money {
   scale: number; // the number of decimals in this currency
   amount: number;

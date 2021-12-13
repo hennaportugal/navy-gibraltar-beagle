@@ -55,6 +55,52 @@ describe('PlentinaService', () => {
         expect(plentinaService.allocate(money, options)).toEqual(expected);
       });
     });
+
+    describe('corner cases', () => {
+      it('allocates non-scaled money with scaled values (parts)', () => {
+        const money = {
+          scale: 0,
+          amount: 100
+        }
+
+        const expected = [
+          {
+            scale: 0,
+            amount: 34
+          }, {
+            scale: 0,
+            amount: 33
+          }, {
+            scale: 0,
+            amount: 33
+          }, 
+        ]
+
+        expect(plentinaService.allocate(money, { parts: 3 })).toEqual(expected);
+      })
+
+      it('allocates non-scaled money with scaled values (parts)', () => {
+        const money = {
+          scale: 0,
+          amount: 100
+        }
+
+        const expected = [
+          {
+            scale: 0,
+            amount: 34
+          }, {
+            scale: 0,
+            amount: 33
+          }, {
+            scale: 0,
+            amount: 33
+          }, 
+        ]
+
+        expect(plentinaService.allocate(money, { ratio: [1, 1, 1] })).toEqual(expected);
+      })
+    })
   });
 
   describe('add', () => {
@@ -156,5 +202,53 @@ describe('PlentinaService', () => {
 
       expect(plentinaService.multiply(money, factor, scale)).toEqual(expected);
     });
+
+    describe('corner cases', () => {
+      it('multiplies non-scaled money with scaled values', () => {
+        const left = {
+          scale: 0,
+          amount: 100 
+        }
+
+        expect(plentinaService.multiply(left, 6667, 4)).toEqual({ scale: 0, amount: 67 });
+      })
+    })
   });
+
+  describe('money instantiation', ()=> {
+    it('should throw an error on unwanted decimals', () => {
+      const money = <Money> {
+        scale: 0,
+        amount: 1.1
+      }
+
+      // there should be cleanup that happens
+      // so that money drops decimal parts
+      expect(money.amount % 1).toEqual(0)
+    })
+
+    describe('invalid scales', () => {
+      it('should throw an error on invalid scales', () => {
+        const money = <Money> {
+          scale: -1,
+          amount: 1
+        }
+
+        // there should be cleanup that happens
+        // so that scale is valid
+        expect(money.scale >= 0).toEqual(true)
+      })
+
+      it('should throw an error on invalid scales', () => {
+        const money = <Money> {
+          scale: 1.234,
+          amount: 1
+        }
+
+        // there should be cleanup that happens
+        // so that scale is valid
+        expect(money.scale % 1).toEqual(0)
+      })
+    })
+  })
 });
